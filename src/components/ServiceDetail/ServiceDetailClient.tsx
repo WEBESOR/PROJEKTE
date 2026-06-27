@@ -77,7 +77,8 @@ export function ServiceDetailClient() {
 
       <section className="relative min-h-[70vh] flex items-center pt-20 pb-32 px-6 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-[#0a0a0a] to-blue-950" />
+          <img src={`/images/${slug}.jpg`} alt={service.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 via-[#0a0a0a]/70 to-blue-950/80" />
           <div className="absolute inset-0 opacity-20" style={{
             background: `radial-gradient(ellipse at 50% 30%, ${service.accent}22, transparent 60%)`,
           }} />

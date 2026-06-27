@@ -15,11 +15,12 @@ interface FilmCardProps {
   accentColor: string;
   gradientFrom: string;
   gradientTo: string;
+  image: string;
 }
 
 export function FilmCard({
   title, subtitle, cta, icon, index, href,
-  accentColor, gradientFrom, gradientTo,
+  accentColor, gradientFrom, gradientTo, image,
 }: FilmCardProps) {
   const router = useRouter();
   const mouse = useMousePosition();
@@ -36,17 +37,15 @@ export function FilmCard({
       onClick={() => router.push(href)}
     >
       <div className="relative h-[70vh] min-h-[500px] rounded-2xl overflow-hidden border border-white/5">
-        {/* Cinematic gradient background with parallax */}
+        {/* Background image */}
         <motion.div
           className="absolute inset-0"
-          animate={{
-            scale: isHovered ? 1.08 : 1,
-            background: isHovered
-              ? `radial-gradient(ellipse at ${mouse.x}px ${mouse.y}px, ${gradientFrom}44, ${gradientTo}22, #0a0a0a)`
-              : `linear-gradient(135deg, ${gradientFrom}22, ${gradientTo}11, #0a0a0a)`,
-          }}
+          animate={{ scale: isHovered ? 1.08 : 1 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-        />
+        >
+          <img src={image} alt={title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-[#0a0a0a]/30" />
+        </motion.div>
 
         {/* Animated gradient orbs */}
         <motion.div

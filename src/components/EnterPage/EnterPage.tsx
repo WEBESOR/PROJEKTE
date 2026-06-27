@@ -14,6 +14,7 @@ const films = [
     accentColor: "#f59e0b",
     gradientFrom: "#f59e0b",
     gradientTo: "#d97706",
+    image: "/images/enter-rueckbau.jpg",
   },
   {
     title: "Asbest & Schadstoffsanierung",
@@ -24,6 +25,7 @@ const films = [
     accentColor: "#3b82f6",
     gradientFrom: "#3b82f6",
     gradientTo: "#1d4ed8",
+    image: "/images/enter-asbest.jpg",
   },
   {
     title: "Entsorgung & Logistik",
@@ -34,6 +36,7 @@ const films = [
     accentColor: "#f97316",
     gradientFrom: "#f97316",
     gradientTo: "#ea580c",
+    image: "/images/enter-entsorgung.jpg",
   },
   {
     title: "Glasfaser & Elektrotechnik",
@@ -44,6 +47,7 @@ const films = [
     accentColor: "#06b6d4",
     gradientFrom: "#06b6d4",
     gradientTo: "#0891b2",
+    image: "/images/enter-glasfaser.jpg",
   },
 ];
 

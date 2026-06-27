@@ -13,11 +13,8 @@ function getClient(): MuAPI {
   return client;
 }
 
-function extractUrl(result: Record<string, unknown>): string {
-  if (result.url && typeof result.url === "string") return result.url;
-  const data = result.data;
-  if (Array.isArray(data) && data[0]?.url) return data[0].url as string;
-  throw new Error("No URL in response");
+async function waitForResult(id: string) {
+  return getClient().predictions.wait(id);
 }
 
 export type MuapiResult = {
@@ -28,40 +25,55 @@ export type MuapiResult = {
 export async function generateImage(params: {
   prompt: string;
   model?: string;
-  size?: string;
+  width?: number;
+  height?: number;
 }): Promise<MuapiResult> {
-  const result = await getClient().images.generate({
+  const { id } = await getClient().images.generate({
     prompt: params.prompt,
     model: params.model ?? "flux-dev",
-    size: params.size ?? "1024x1024",
+    width: params.width ?? 1024,
+    height: params.height ?? 1024,
   });
-  return { url: extractUrl(result), type: "image" };
+  const result = await waitForResult(id);
+  const url = result.output?.[0]?.url ?? result.data?.[0]?.url;
+  if (!url) throw new Error("No URL in response: " + JSON.stringify(result));
+  return { url, type: "image" };
 }
 
 export async function generateVideo(params: {
   prompt: string;
   model?: string;
   duration?: number;
+  aspectRatio?: string;
 }): Promise<MuapiResult> {
-  const result = await getClient().videos.generate({
+  const { id } = await getClient().videos.generate({
     prompt: params.prompt,
     model: params.model ?? "kling-master",
     duration: params.duration ?? 5,
+    aspectRatio: params.aspectRatio ?? "16:9",
   });
-  return { url: extractUrl(result), type: "video" };
+  const result = await waitForResult(id);
+  const url = result.output?.[0]?.url ?? result.data?.[0]?.url;
+  if (!url) throw new Error("No URL in response: " + JSON.stringify(result));
+  return { url, type: "video" };
 }
 
 export async function imageToVideo(params: {
   prompt: string;
   imageUrl: string;
   model?: string;
+  duration?: number;
 }): Promise<MuapiResult> {
-  const result = await getClient().videos.fromImage({
+  const { id } = await getClient().videos.fromImage({
     prompt: params.prompt,
     image: params.imageUrl,
-    model: params.model ?? "kling-master",
+    model: params.model ?? "kling-std",
+    duration: params.duration ?? 5,
   });
-  return { url: extractUrl(result), type: "video" };
+  const result = await waitForResult(id);
+  const url = result.output?.[0]?.url ?? result.data?.[0]?.url;
+  if (!url) throw new Error("No URL in response: " + JSON.stringify(result));
+  return { url, type: "video" };
 }
 
 export async function editImage(params: {
@@ -69,12 +81,15 @@ export async function editImage(params: {
   imageUrl: string;
   model?: string;
 }): Promise<MuapiResult> {
-  const result = await getClient().images.edit({
+  const { id } = await getClient().images.edit({
     prompt: params.prompt,
     image: params.imageUrl,
     model: params.model ?? "flux-kontext-dev",
   });
-  return { url: extractUrl(result), type: "image" };
+  const result = await waitForResult(id);
+  const url = result.output?.[0]?.url ?? result.data?.[0]?.url;
+  if (!url) throw new Error("No URL in response: " + JSON.stringify(result));
+  return { url, type: "image" };
 }
 
 export async function listModels() {

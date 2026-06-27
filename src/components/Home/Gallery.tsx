@@ -52,30 +52,17 @@ export function Gallery() {
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
             >
-              {/* Placeholder gradient background that simulates realistic construction photos */}
-              <div className={cn(
-                "absolute inset-0 transition-transform duration-700",
-                "bg-gradient-to-br",
-                index % 3 === 0 ? "from-zinc-800 via-zinc-900 to-amber-950" :
-                index % 3 === 1 ? "from-zinc-800 via-zinc-900 to-blue-950" :
-                "from-zinc-800 via-zinc-900 to-orange-950"
-              )}>
-                {/* Simulated image content with geometric patterns */}
-                <div className="absolute inset-0 opacity-10" style={{
-                  backgroundImage: `
-                    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-                    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-                    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
-                    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%)
-                  `,
-                  backgroundSize: '20px 20px',
-                  backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-                }} />
-              </div>
+              <img
+                src={`/images/gallery-${img.id}.jpg`}
+                alt={img.label}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-black/30" />
 
-              {/* Hover effect */}
+              {/* Hover overlay */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               />
 
               {/* Label */}

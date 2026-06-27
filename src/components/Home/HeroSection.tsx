@@ -17,8 +17,8 @@ export function HeroSection() {
     <section ref={ref} className="relative h-screen min-h-[700px] overflow-hidden bg-[#0a0a0a]">
       {/* Cinematic background */}
       <motion.div className="absolute inset-0" style={{ scale, opacity }}>
-        {/* Animated gradient background simulating construction site at dusk */}
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-[#0a0a0a] to-blue-950" />
+        <img src="/images/hero.jpg" alt="LORE:BAU" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 via-[#0a0a0a]/60 to-blue-950/80" />
         <div className="absolute inset-0 opacity-20" style={{
           backgroundImage: `radial-gradient(ellipse at 30% 50%, rgba(245,158,11,0.3) 0%, transparent 50%),
                             radial-gradient(ellipse at 70% 30%, rgba(59,130,246,0.2) 0%, transparent 50%)`,
