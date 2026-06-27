@@ -1,11 +1,30 @@
 {
-  "name": "projekte",
+  "name": "lorebau",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "deploy:pages": "npx wrangler pages deploy dist/ --project-name=projekte",
-    "deploy:workers": "npx wrangler deploy"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "deploy:pages": "npx wrangler pages deploy out/ --project-name=projekte",
+    "deploy:workers": "npx wrangler deploy --config wrangler.workers.toml"
+  },
+  "dependencies": {
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "framer-motion": "^12.6.3",
+    "lucide-react": "^0.483.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "typescript": "^5.8.3",
+    "tailwindcss": "^4.1.4",
+    "@tailwindcss/postcss": "^4.1.4",
+    "postcss": "^8.5.3"
   }
 }
