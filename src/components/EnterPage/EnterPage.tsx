@@ -228,7 +228,7 @@ export function EnterPage() {
               </motion.div>
 
               <div className="flex-1 px-4 md:px-8 pb-20 overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 max-w-7xl mx-auto">
                   {films.map((film, index) => (
                     <motion.div
                       key={film.title}
@@ -236,7 +236,7 @@ export function EnterPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, delay: 0.6 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      <FilmCard {...film} index={index} />
+                      <FilmCard {...film} index={index} portrait />
                     </motion.div>
                   ))}
                 </div>

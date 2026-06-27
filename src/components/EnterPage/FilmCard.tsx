@@ -16,11 +16,12 @@ interface FilmCardProps {
   gradientFrom: string;
   gradientTo: string;
   image: string;
+  portrait?: boolean;
 }
 
 export function FilmCard({
   title, subtitle, cta, icon, index, href,
-  accentColor, gradientFrom, gradientTo, image,
+  accentColor, gradientFrom, gradientTo, image, portrait,
 }: FilmCardProps) {
   const router = useRouter();
   const mouse = useMousePosition();
@@ -36,7 +37,7 @@ export function FilmCard({
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(href)}
     >
-      <div className="relative h-[70vh] min-h-[500px] rounded-2xl overflow-hidden border border-white/5">
+      <div className={`relative ${portrait ? "aspect-[1/4] md:aspect-[1/3]" : "h-[70vh] min-h-[500px]"} rounded-2xl overflow-hidden border border-white/5`}>
         {/* Background image */}
         <motion.div
           className="absolute inset-0"
@@ -69,29 +70,45 @@ export function FilmCard({
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }} />
 
+        {/* Film sprocket holes (portrait mode) */}
+        {portrait && (
+          <>
+            <div className="absolute top-0 bottom-0 left-0 w-[6px] flex flex-col justify-around py-4 opacity-20">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="w-[6px] h-[6px] rounded-full border border-white" />
+              ))}
+            </div>
+            <div className="absolute top-0 bottom-0 right-0 w-[6px] flex flex-col justify-around py-4 opacity-20">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="w-[6px] h-[6px] rounded-full border border-white" />
+              ))}
+            </div>
+          </>
+        )}
+
         {/* Cinematic bottom gradient */}
         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
 
         {/* Content */}
-        <div className="absolute inset-0 p-10 flex flex-col justify-end">
+        <div className={`absolute inset-0 ${portrait ? "p-5 md:p-6" : "p-10"} flex flex-col justify-end`}>
           {/* Icon */}
           <motion.div
-            className="mb-4 w-14 h-14 rounded-xl flex items-center justify-center border border-white/10"
+            className={`${portrait ? "mb-2 w-9 h-9 md:w-11 md:h-11" : "mb-4 w-14 h-14"} rounded-xl flex items-center justify-center border border-white/10`}
             style={{ background: `${accentColor}15` }}
             animate={{ scale: isHovered ? 1.1 : 1, borderColor: isHovered ? accentColor + '66' : 'rgba(255,255,255,0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <div style={{ color: accentColor }}>{icon}</div>
+            <div className={portrait ? "scale-75 md:scale-90" : ""} style={{ color: accentColor }}>{icon}</div>
           </motion.div>
 
           {/* Number */}
-          <span className="text-7xl font-black opacity-[0.04] absolute top-10 right-10 select-none" style={{ color: accentColor }}>
+          <span className={`${portrait ? "text-4xl md:text-5xl" : "text-7xl"} font-black opacity-[0.04] absolute top-4 md:top-6 right-4 md:right-6 select-none`} style={{ color: accentColor }}>
             {String(index + 1).padStart(2, '0')}
           </span>
 
           {/* Title */}
           <motion.h3
-            className="text-3xl md:text-4xl font-bold mb-3 tracking-tight"
+            className={`${portrait ? "text-lg md:text-xl" : "text-3xl md:text-4xl"} font-bold mb-1 md:mb-2 tracking-tight`}
             animate={{ x: isHovered ? 8 : 0 }}
             transition={{ duration: 0.3 }}
           >
@@ -100,7 +117,7 @@ export function FilmCard({
 
           {/* Subtitle */}
           <motion.p
-            className="text-sm md:text-base text-zinc-400 max-w-md mb-6 leading-relaxed"
+            className={`${portrait ? "text-[10px] md:text-xs" : "text-sm md:text-base"} text-zinc-400 ${portrait ? "max-w-full" : "max-w-md"} mb-4 md:mb-5 leading-relaxed`}
             animate={{ opacity: isHovered ? 1 : 0.7 }}
             transition={{ duration: 0.3 }}
           >
@@ -109,13 +126,13 @@ export function FilmCard({
 
           {/* CTA Button */}
           <motion.div
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold"
+            className={`inline-flex items-center gap-2 ${portrait ? "text-[9px] md:text-[10px]" : "text-xs"} uppercase tracking-[0.2em] font-semibold`}
             style={{ color: accentColor }}
             animate={{ gap: isHovered ? '12px' : '8px' }}
             transition={{ duration: 0.3 }}
           >
-            {cta}
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            {portrait ? "" : cta}
+            <ArrowRight className={`${portrait ? "w-3 h-3" : "w-4 h-4"} transition-transform duration-300 group-hover:translate-x-1`} />
           </motion.div>
         </div>
 
