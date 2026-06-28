@@ -97,9 +97,9 @@ export function EnterPage() {
             </div>
           </motion.div>
 
-          {/* Dashboard - 4 cards filling the viewport */}
-          <div className="flex-1 flex items-center justify-center px-3 md:px-6 py-24 md:py-20">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 w-full h-full" style={{ maxHeight: "85vh" }}>
+          {/* Dashboard - 4 portrait banners */}
+          <div className="flex-1 flex items-center justify-center px-3 md:px-8 py-24 md:py-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 max-w-6xl mx-auto w-full place-items-center">
               {films.map((film, index) => (
                 <FilmCard key={film.title} {...film} index={index} />
               ))}

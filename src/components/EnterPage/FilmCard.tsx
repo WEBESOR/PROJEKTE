@@ -34,12 +34,12 @@ export function FilmCard({
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.6 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group cursor-pointer h-full"
+      className="relative group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(href)}
     >
-      <div className="relative h-full rounded-2xl overflow-hidden border border-white/5 bg-[#0a0a0a]">
+      <div className="relative aspect-[1/4] md:aspect-[1/3] rounded-2xl overflow-hidden border border-white/5 bg-[#0a0a0a]">
         {/* Image with grayscale → color transition */}
         <motion.div
           className="absolute inset-0"
