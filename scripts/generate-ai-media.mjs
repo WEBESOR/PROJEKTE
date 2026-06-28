@@ -1,59 +1,43 @@
-/**
- * AI Media Generator für LORE:BAU
- * 
- * Usage: node scripts/generate-ai-media.mjs
- * Erfordert: MUAPI_API_KEY env var
- *
- * Generiert alle Bilder/Videos via Muapi.ai und speichert sie in public/images und public/videos
- */
-
-const MUAPI_KEY = process.env.MUAPI_API_KEY;
-if (!MUAPI_KEY) {
-  console.error("❌ MUAPI_API_KEY env var required");
-  console.log("Get one at https://muapi.ai");
+const HF_API_KEY = process.env.HF_API_KEY;
+const HF_API_SECRET = process.env.HF_API_SECRET;
+if (!HF_API_KEY || !HF_API_SECRET) {
+  console.error("❌ HF_API_KEY and HF_API_SECRET env vars required");
   process.exit(1);
 }
 
-const { MuAPI } = await import("muapi-js");
-const client = new MuAPI(MUAPI_KEY);
+const { createHiggsfieldClient } = await import("@higgsfield/client/v2");
+const hf = createHiggsfieldClient({ apiKey: HF_API_KEY, apiSecret: HF_API_SECRET });
 
 const generations = [
-  // Hero Background
-  { type: "image", file: "hero.jpg", model: "flux-dev",
+  { type: "image", file: "hero.jpg",
     prompt: "cinematic wide shot of construction site at golden hour, heavy machinery silhouettes, dust particles in warm light, industrial atmosphere, dramatic sky, 8k quality" },
-
-  // Service images
-  { type: "image", file: "rueckbau.jpg", model: "flux-dev",
+  { type: "image", file: "rueckbau.jpg",
     prompt: "industrial building demolition, excavator tearing down concrete structure, dust clouds, dramatic sunlight breaking through, cinematic composition, dark moody tones" },
-  { type: "image", file: "asbest.jpg", model: "flux-dev",
+  { type: "image", file: "asbest.jpg",
     prompt: "professional asbestos removal team in hazmat suits, blue protective gear, decontamination chamber, industrial safety lights, cinematic, photorealistic" },
-  { type: "image", file: "entsorgung.jpg", model: "flux-dev",
+  { type: "image", file: "entsorgung.jpg",
     prompt: "large construction waste recycling facility, sorted piles of materials, conveyor belts, industrial scale, dramatic lighting, cinematic" },
-  { type: "image", file: "glasfaser.jpg", model: "flux-dev",
+  { type: "image", file: "glasfaser.jpg",
     prompt: "fiber optic cables glowing with blue light, technician installing network infrastructure, data center, neon cyan accents, cinematic" },
-
-  // Enterpage backgrounds
-  { type: "image", file: "enter-rueckbau.jpg", model: "flux-dev",
+  { type: "image", file: "enter-rueckbau.jpg",
     prompt: "dramatic low angle shot of building demolition, debris falling, dust illuminated by sunlight, amber and dark tones, cinematic film still" },
-  { type: "image", file: "enter-asbest.jpg", model: "flux-dev",
+  { type: "image", file: "enter-asbest.jpg",
     prompt: "mysterious industrial corridor, blue safety lights, hazmat suits hanging, hazardous environment, cinematic, dark atmosphere, teal and orange" },
-  { type: "image", file: "enter-entsorgung.jpg", model: "flux-dev",
+  { type: "image", file: "enter-entsorgung.jpg",
     prompt: "massive recycling plant interior, compressed waste cubes, industrial machinery, dramatic scale, orange and dark tones, cinematic" },
-  { type: "image", file: "enter-glasfaser.jpg", model: "flux-dev",
+  { type: "image", file: "enter-glasfaser.jpg",
     prompt: "abstract glowing fiber optic network, cyan light trails, dark background, futuristic technology, cinematic, neon blue aesthetic" },
-
-  // Gallery
-  { type: "image", file: "gallery-1.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-1.jpg",
     prompt: "construction workers in orange vests on steel structure at sunset, hard hats, industrial background, cinematic lighting" },
-  { type: "image", file: "gallery-2.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-2.jpg",
     prompt: "aerial view of demolition site, excavator on rubble pile, geometric patterns of destruction, dramatic shadows" },
-  { type: "image", file: "gallery-3.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-3.jpg",
     prompt: "close-up of heavy construction machinery, hydraulic arm, mechanical details, oil and dirt, cinematic industrial aesthetic" },
-  { type: "image", file: "gallery-4.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-4.jpg",
     prompt: "modern glass skyscraper under construction, crane against sunset sky, architectural beauty, cinematic wide shot" },
-  { type: "image", file: "gallery-5.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-5.jpg",
     prompt: "industrial pipe system, steam valves, metallic textures, dramatic workshop lighting, dark moody industrial photography" },
-  { type: "image", file: "gallery-6.jpg", model: "flux-dev",
+  { type: "image", file: "gallery-6.jpg",
     prompt: "portrait of construction worker, hard hat, face covered in dust, welding sparks in background, dramatic cinematic lighting" },
 ];
 
@@ -66,9 +50,9 @@ async function download(url, dest) {
 }
 
 async function main() {
-  console.log("=" .repeat(50));
-  console.log("  LORE:BAU AI Media Generator");
-  console.log("=" .repeat(50));
+  console.log("=".repeat(50));
+  console.log("  LORE:BAU AI Media Generator (Higgsfield)");
+  console.log("=".repeat(50));
 
   for (const gen of generations) {
     const dest = `public/images/${gen.file}`;
@@ -77,15 +61,16 @@ async function main() {
 
     process.stdout.write(`  → Generating ${gen.file}...`);
     try {
-      const isGallery = gen.file.startsWith("gallery");
-      const { id } = await client.images.generate({
-        prompt: gen.prompt,
-        model: gen.model,
-        width: isGallery || gen.file.startsWith("enter-") ? 1024 : 1920,
-        height: isGallery ? 1024 : 1080,
+      const isGallery = gen.file.startsWith("gallery") || gen.file.startsWith("enter-");
+      const result = await hf.subscribe("/v1/text2image/soul", {
+        input: {
+          prompt: gen.prompt,
+          width_and_height: isGallery ? "LANDSCAPE_1024x1024" : "LANDSCAPE_2048x1152",
+          quality: "1080p",
+          batch_size: 1,
+        },
       });
-      const result = await client.predictions.wait(id);
-      const url = result.output?.[0]?.url || result.data?.[0]?.url;
+      const url = result.images?.[0]?.url;
       if (!url) throw new Error("No URL in response: " + JSON.stringify(result));
       await download(url, dest);
       console.log(" done  ");
