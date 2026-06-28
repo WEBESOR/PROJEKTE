@@ -1,138 +1,202 @@
-import React from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMousePosition } from "@/hooks/useMousePosition";
 
 interface FilmCardProps {
   title: string;
-  subtitle: string;
-  cta: string;
   icon: React.ReactNode;
   index: number;
   href: string;
   accentColor: string;
-  gradientFrom: string;
-  gradientTo: string;
   image: string;
-  portrait?: boolean;
 }
 
+const serviceTags: Record<string, string[]> = {
+  rueckbau: ["Abbruch", "Entkernung", "Maschinen"],
+  asbest: ["TRGS 519", "Unterdruck", "Freimessung"],
+  entsorgung: ["Container", "Recycling", "Logistik"],
+  glasfaser: ["Glasfaser", "Elektro", "Smart Home"],
+};
+
 export function FilmCard({
-  title, subtitle, cta, icon, index, href,
-  accentColor, gradientFrom, gradientTo, image, portrait,
+  title, icon, index, href, accentColor, image,
 }: FilmCardProps) {
   const router = useRouter();
   const mouse = useMousePosition();
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const serviceId = href.split("/").pop() || "";
+  const tags = serviceTags[serviceId] || [];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 60 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.4 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group cursor-pointer"
+      transition={{ duration: 0.8, delay: 0.6 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+      className="relative group cursor-pointer h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(href)}
     >
-      <div className={`relative ${portrait ? "aspect-[1/4] md:aspect-[1/3]" : "h-[70vh] min-h-[500px]"} rounded-2xl overflow-hidden border border-white/5`}>
-        {/* Background image */}
+      <div className="relative h-full rounded-2xl overflow-hidden border border-white/5 bg-[#0a0a0a]">
+        {/* Image with grayscale → color transition */}
         <motion.div
           className="absolute inset-0"
-          animate={{ scale: isHovered ? 1.08 : 1 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          animate={{
+            scale: isHovered ? 1.12 : 1,
+            filter: isHovered ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.5)",
+          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <img src={image} alt={title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-[#0a0a0a]/30" />
+          <motion.img
+            src={image}
+            alt=""
+            className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+            onLoad={() => setImageLoaded(true)}
+            animate={{
+              scale: isHovered ? [1, 1.05, 1] : 1,
+            }}
+            transition={{ duration: 4, repeat: isHovered ? Infinity : 0, ease: "easeInOut" }}
+          />
         </motion.div>
 
-        {/* Animated gradient orbs */}
+        {/* Overlay gradient - stronger in grayscale, softer on hover */}
         <motion.div
-          className="absolute -inset-40 opacity-30"
+          className="absolute inset-0"
           animate={{
             background: isHovered
-              ? `radial-gradient(800px circle at ${mouse.x}px ${mouse.y}px, ${accentColor}33, transparent 50%)`
-              : `radial-gradient(800px circle at 50% 50%, ${accentColor}11, transparent 50%)`,
+              ? `linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.3) 50%, rgba(10,10,10,0.85) 100%)`
+              : `linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.4) 50%, rgba(10,10,10,0.9) 100%)`,
           }}
           transition={{ duration: 0.5 }}
         />
 
-        {/* Particle grid lines (industrial feel) */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `linear-gradient(${accentColor}22 1px, transparent 1px), linear-gradient(90deg, ${accentColor}22 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-        }} />
+        {/* Accent glow on hover */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            background: isHovered
+              ? `radial-gradient(600px circle at ${mouse.x}px ${mouse.y}px, ${accentColor}33, transparent 60%)`
+              : "transparent",
+          }}
+          transition={{ duration: 0.5 }}
+        />
 
-        {/* Film grain overlay */}
-        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{
+        {/* Film grain */}
+        <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }} />
 
-        {/* Film sprocket holes (portrait mode) */}
-        {portrait && (
-          <>
-            <div className="absolute top-0 bottom-0 left-0 w-[6px] flex flex-col justify-around py-4 opacity-20">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="w-[6px] h-[6px] rounded-full border border-white" />
-              ))}
-            </div>
-            <div className="absolute top-0 bottom-0 right-0 w-[6px] flex flex-col justify-around py-4 opacity-20">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="w-[6px] h-[6px] rounded-full border border-white" />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Scanlines */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
+          backgroundSize: "100% 4px",
+        }} />
 
-        {/* Cinematic bottom gradient */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+        {/* Film sprocket holes */}
+        <div className="absolute top-0 bottom-0 left-0 w-[6px] flex flex-col justify-around py-4 opacity-25">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <div key={i} className="w-[6px] h-[6px] rounded-full border border-white/60" />
+          ))}
+        </div>
+        <div className="absolute top-0 bottom-0 right-0 w-[6px] flex flex-col justify-around py-4 opacity-25">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <div key={i} className="w-[6px] h-[6px] rounded-full border border-white/60" />
+          ))}
+        </div>
 
-        {/* Content */}
-        <div className={`absolute inset-0 ${portrait ? "p-5 md:p-6" : "p-10"} flex flex-col justify-end`}>
-          {/* Icon */}
+        {/* Icon badge */}
+        <motion.div
+          className="absolute top-4 left-4 w-9 h-9 md:w-11 md:h-11 rounded-xl flex items-center justify-center border z-10"
+          style={{
+            background: `${accentColor}15`,
+            borderColor: isHovered ? `${accentColor}66` : "rgba(255,255,255,0.1)",
+          }}
+          animate={{ scale: isHovered ? 1.1 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="scale-75 md:scale-90" style={{ color: accentColor }}>{icon}</div>
+        </motion.div>
+
+        {/* Number */}
+        <span
+          className="absolute top-4 right-4 text-4xl font-black opacity-[0.06] select-none z-10"
+          style={{ color: accentColor }}
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
+
+        {/* Tags */}
+        <motion.div
+          className="absolute top-14 left-4 right-4 flex flex-wrap gap-1.5 z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full border"
+              style={{
+                borderColor: `${accentColor}33`,
+                color: accentColor,
+                background: `${accentColor}11`,
+              }}
+            >
+              {tag}
+            </span>
+          ))}
+        </motion.div>
+
+        {/* Content at bottom */}
+        <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 z-10">
+          {/* Title with cinematic reveal */}
+          <div className="overflow-hidden mb-1">
+            <motion.h3
+              className="text-lg md:text-xl font-black tracking-tighter leading-tight"
+              initial={{ y: 40, opacity: 0 }}
+              animate={{
+                y: isHovered ? 0 : 0,
+                opacity: 1,
+                color: isHovered ? "#ffffff" : "rgba(255,255,255,0.6)",
+              }}
+              transition={{ duration: 0.4 }}
+            >
+              {title}
+            </motion.h3>
+          </div>
+
+          {/* Animated subtitle line */}
           <motion.div
-            className={`${portrait ? "mb-2 w-9 h-9 md:w-11 md:h-11" : "mb-4 w-14 h-14"} rounded-xl flex items-center justify-center border border-white/10`}
-            style={{ background: `${accentColor}15` }}
-            animate={{ scale: isHovered ? 1.1 : 1, borderColor: isHovered ? accentColor + '66' : 'rgba(255,255,255,0.1)' }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className={portrait ? "scale-75 md:scale-90" : ""} style={{ color: accentColor }}>{icon}</div>
-          </motion.div>
+            className="h-px mb-1.5"
+            style={{ background: `linear-gradient(90deg, ${accentColor}, transparent)` }}
+            initial={{ width: "0%" }}
+            animate={{ width: isHovered ? "100%" : "0%" }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          />
 
-          {/* Number */}
-          <span className={`${portrait ? "text-4xl md:text-5xl" : "text-7xl"} font-black opacity-[0.04] absolute top-4 md:top-6 right-4 md:right-6 select-none`} style={{ color: accentColor }}>
-            {String(index + 1).padStart(2, '0')}
-          </span>
-
-          {/* Title */}
-          <motion.h3
-            className={`${portrait ? "text-lg md:text-xl" : "text-3xl md:text-4xl"} font-bold mb-1 md:mb-2 tracking-tight`}
-            animate={{ x: isHovered ? 8 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {title}
-          </motion.h3>
-
-          {/* Subtitle */}
-          <motion.p
-            className={`${portrait ? "text-[10px] md:text-xs" : "text-sm md:text-base"} text-zinc-400 ${portrait ? "max-w-full" : "max-w-md"} mb-4 md:mb-5 leading-relaxed`}
-            animate={{ opacity: isHovered ? 1 : 0.7 }}
-            transition={{ duration: 0.3 }}
-          >
-            {subtitle}
-          </motion.p>
-
-          {/* CTA Button */}
+          {/* Hover indicator */}
           <motion.div
-            className={`inline-flex items-center gap-2 ${portrait ? "text-[9px] md:text-[10px]" : "text-xs"} uppercase tracking-[0.2em] font-semibold`}
-            style={{ color: accentColor }}
-            animate={{ gap: isHovered ? '12px' : '8px' }}
+            className="flex items-center gap-1.5"
+            animate={{ opacity: isHovered ? 1 : 0.4 }}
             transition={{ duration: 0.3 }}
           >
-            {portrait ? "" : cta}
-            <ArrowRight className={`${portrait ? "w-3 h-3" : "w-4 h-4"} transition-transform duration-300 group-hover:translate-x-1`} />
+            <span
+              className="text-[9px] uppercase tracking-[0.15em] font-semibold"
+              style={{ color: accentColor }}
+            >
+              {isHovered ? "Jetzt entdecken" : "Leistung"}
+            </span>
+            <motion.svg
+              width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke={accentColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              animate={{ x: isHovered ? 4 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </motion.svg>
           </motion.div>
         </div>
 
@@ -141,8 +205,8 @@ export function FilmCard({
           className="absolute inset-0 rounded-2xl pointer-events-none"
           animate={{
             boxShadow: isHovered
-              ? `inset 0 0 0 1px ${accentColor}44, 0 0 60px ${accentColor}22`
-              : 'inset 0 0 0 1px rgba(255,255,255,0.05)',
+              ? `inset 0 0 0 1px ${accentColor}44, 0 0 40px ${accentColor}22`
+              : "inset 0 0 0 1px rgba(255,255,255,0.05)",
           }}
           transition={{ duration: 0.4 }}
         />

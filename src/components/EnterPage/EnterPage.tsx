@@ -10,46 +10,30 @@ type Phase = "loading" | "intro" | "sequence" | "grid";
 const films = [
   {
     title: "Rückbau & Entkernung",
-    subtitle: "Wir schaffen Raum für Neues",
-    cta: "Bereich betreten",
     icon: <Building2 className="w-7 h-7" />,
-    href: "/home?service=rueckbau",
+    href: "/services/rueckbau",
     accentColor: "#f59e0b",
-    gradientFrom: "#f59e0b",
-    gradientTo: "#d97706",
     image: "/images/enter-rueckbau.jpg",
   },
   {
     title: "Asbest & Schadstoffsanierung",
-    subtitle: "Sicherheit beginnt dort, wo andere stoppen",
-    cta: "Bereich betreten",
     icon: <Shield className="w-7 h-7" />,
-    href: "/home?service=asbest",
+    href: "/services/asbest",
     accentColor: "#3b82f6",
-    gradientFrom: "#3b82f6",
-    gradientTo: "#1d4ed8",
     image: "/images/enter-asbest.jpg",
   },
   {
     title: "Entsorgung & Logistik",
-    subtitle: "Effizienz auf jeder Baustelle",
-    cta: "Bereich betreten",
     icon: <Truck className="w-7 h-7" />,
-    href: "/home?service=entsorgung",
+    href: "/services/entsorgung",
     accentColor: "#f97316",
-    gradientFrom: "#f97316",
-    gradientTo: "#ea580c",
     image: "/images/enter-entsorgung.jpg",
   },
   {
     title: "Glasfaser & Elektrotechnik",
-    subtitle: "Die Infrastruktur der Zukunft",
-    cta: "Bereich betreten",
     icon: <Zap className="w-7 h-7" />,
-    href: "/home?service=glasfaser",
+    href: "/services/glasfaser",
     accentColor: "#06b6d4",
-    gradientFrom: "#06b6d4",
-    gradientTo: "#0891b2",
     image: "/images/enter-glasfaser.jpg",
   },
 ];
@@ -228,16 +212,9 @@ export function EnterPage() {
               </motion.div>
 
               <div className="flex-1 px-4 md:px-8 pb-20 overflow-y-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 max-w-7xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 max-w-7xl mx-auto h-full" style={{ gridTemplateRows: "minmax(60vh, 1fr)" }}>
                   {films.map((film, index) => (
-                    <motion.div
-                      key={film.title}
-                      initial={{ opacity: 0, y: 60 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: 0.6 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                    >
-                      <FilmCard {...film} index={index} portrait />
-                    </motion.div>
+                    <FilmCard key={film.title} {...film} index={index} />
                   ))}
                 </div>
               </div>
@@ -283,30 +260,20 @@ function SequenceScene({
       <img src={film.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-[#0a0a0a]/20" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
-
-      {/* Film grain */}
       <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
       }} />
-
-      {/* Accent gradient orb */}
       <motion.div
         className="absolute -inset-40"
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.25 }}
         transition={{ duration: 2 }}
-        style={{
-          background: `radial-gradient(800px circle at 50% 50%, ${film.accentColor}44, transparent 60%)`,
-        }}
+        style={{ background: `radial-gradient(800px circle at 50% 50%, ${film.accentColor}44, transparent 60%)` }}
       />
-
-      {/* Scanline overlay */}
       <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
-        backgroundSize: '100% 4px',
+        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
+        backgroundSize: "100% 4px",
       }} />
-
-      {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -314,25 +281,12 @@ function SequenceScene({
           transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-2xl"
         >
-          {/* Number */}
-          <span
-            className="text-[10px] uppercase tracking-[0.3em] font-medium mb-6 block"
-            style={{ color: film.accentColor }}
-          >
+          <span className="text-[10px] uppercase tracking-[0.3em] font-medium mb-6 block" style={{ color: film.accentColor }}>
             Kapitel {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
-
-          {/* Title */}
           <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none mb-6">
             <span className="text-white">{film.title}</span>
           </h2>
-
-          {/* Subtitle */}
-          <p className="text-base md:text-lg text-zinc-300 leading-relaxed max-w-xl mb-8">
-            {film.subtitle}
-          </p>
-
-          {/* Enter indicator */}
           <motion.div
             className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-semibold"
             style={{ color: film.accentColor }}
@@ -347,8 +301,6 @@ function SequenceScene({
           </motion.div>
         </motion.div>
       </div>
-
-      {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/5">
         <motion.div
           className="h-full"
@@ -358,24 +310,15 @@ function SequenceScene({
           transition={{ duration: SCENE_DURATION / 1000, ease: "linear" }}
         />
       </div>
-
-      {/* Film reel dots */}
       <div className="absolute top-8 right-8 flex gap-2">
         {Array.from({ length: total }).map((_, i) => (
-          <div
-            key={i}
-            className="w-2 h-2 rounded-full transition-all duration-500"
-            style={{
-              background: i === index ? film.accentColor : "rgba(255,255,255,0.15)",
-              boxShadow: i === index ? `0 0 8px ${film.accentColor}` : "none",
-            }}
-          />
+          <div key={i} className="w-2 h-2 rounded-full transition-all duration-500" style={{
+            background: i === index ? film.accentColor : "rgba(255,255,255,0.15)",
+            boxShadow: i === index ? `0 0 8px ${film.accentColor}` : "none",
+          }} />
         ))}
       </div>
-
-      {/* Skip button */}
-      <button
-        onClick={(e) => { e.stopPropagation(); onSkip(); }}
+      <button onClick={(e) => { e.stopPropagation(); onSkip(); }}
         className="absolute top-8 left-8 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors z-10"
       >
         <SkipForward className="w-3.5 h-3.5" />
