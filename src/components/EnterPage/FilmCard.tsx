@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useMousePosition } from "@/hooks/useMousePosition";
@@ -19,13 +19,20 @@ const serviceTags: Record<string, string[]> = {
   glasfaser: ["Glasfaser", "Elektro", "Smart Home"],
 };
 
+const fallbackGradients: Record<string, string> = {
+  rueckbau: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+  asbest: "linear-gradient(135deg, #1a1a2e 0%, #2d1b69 50%, #1a0a2e 100%)",
+  entsorgung: "linear-gradient(135deg, #1a1a2e 0%, #3d1c02 50%, #1a0a00 100%)",
+  glasfaser: "linear-gradient(135deg, #0a1628 0%, #042f3c 50%, #0a1628 100%)",
+};
+
 export function FilmCard({
   title, icon, index, href, accentColor, image,
 }: FilmCardProps) {
   const router = useRouter();
   const mouse = useMousePosition();
   const [isHovered, setIsHovered] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const serviceId = href.split("/").pop() || "";
   const tags = serviceTags[serviceId] || [];
 
@@ -39,29 +46,37 @@ export function FilmCard({
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(href)}
     >
-      <div className="relative aspect-[1/4] md:aspect-[1/3] rounded-2xl overflow-hidden border border-white/5 bg-[#0a0a0a]">
-        {/* Image with grayscale → color transition */}
-        <motion.div
+      <div className="relative w-full min-h-[300px] md:min-h-[400px] lg:min-h-[500px] rounded-2xl overflow-hidden border border-white/5 bg-[#0a0a0a]">
+        {/* Fallback gradient (always visible behind image) */}
+        <div
           className="absolute inset-0"
-          animate={{
-            scale: isHovered ? 1.12 : 1,
-            filter: isHovered ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.5)",
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <motion.img
-            src={image}
-            alt=""
-            className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-            onLoad={() => setImageLoaded(true)}
-            animate={{
-              scale: isHovered ? [1, 1.05, 1] : 1,
-            }}
-            transition={{ duration: 4, repeat: isHovered ? Infinity : 0, ease: "easeInOut" }}
-          />
-        </motion.div>
+          style={{ background: fallbackGradients[serviceId] || fallbackGradients.rueckbau }}
+        />
 
-        {/* Overlay gradient - stronger in grayscale, softer on hover */}
+        {/* Image with grayscale → color transition */}
+        {!imageError && (
+          <motion.div
+            className="absolute inset-0"
+            animate={{
+              scale: isHovered ? 1.12 : 1,
+              filter: isHovered ? "grayscale(0%) brightness(1.05)" : "grayscale(100%) brightness(0.65)",
+            }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.img
+              src={image}
+              alt=""
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+              animate={{
+                scale: isHovered ? [1, 1.05, 1] : 1,
+              }}
+              transition={{ duration: 4, repeat: isHovered ? Infinity : 0, ease: "easeInOut" }}
+            />
+          </motion.div>
+        )}
+
+        {/* Image overlay gradient */}
         <motion.div
           className="absolute inset-0"
           animate={{
@@ -151,14 +166,10 @@ export function FilmCard({
 
         {/* Content at bottom */}
         <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 z-10">
-          {/* Title with cinematic reveal */}
           <div className="overflow-hidden mb-1">
             <motion.h3
               className="text-lg md:text-xl font-black tracking-tighter leading-tight"
-              initial={{ y: 40, opacity: 0 }}
               animate={{
-                y: isHovered ? 0 : 0,
-                opacity: 1,
                 color: isHovered ? "#ffffff" : "rgba(255,255,255,0.6)",
               }}
               transition={{ duration: 0.4 }}
