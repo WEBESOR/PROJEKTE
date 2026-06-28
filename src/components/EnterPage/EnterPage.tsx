@@ -79,42 +79,10 @@ export function EnterPage() {
       </AnimatePresence>
 
       {loaded && (
-        <div className="relative z-10 min-h-screen flex flex-col">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="fixed top-0 left-0 right-0 z-20 px-6 md:px-8 py-5 flex items-center justify-between"
-          >
-            <div className="text-xl md:text-2xl font-black tracking-tighter">
-              <span className="text-white">LORE</span>
-              <span className="text-amber-500">:</span>
-              <span className="text-white">BAU</span>
-            </div>
-            <div className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-medium">
-              Dashboard
-            </div>
-          </motion.div>
-
-          {/* Dashboard - 4 portrait banners */}
-          <div className="flex-1 flex items-center justify-center px-3 md:px-8 py-24 md:py-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 max-w-6xl mx-auto w-full place-items-center">
-              {films.map((film, index) => (
-                <FilmCard key={film.title} {...film} index={index} />
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom hint */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.5 }}
-            className="fixed bottom-5 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-[0.3em] text-zinc-600"
-          >
-            Bereich auswählen
-          </motion.div>
+        <div className="relative z-10 min-h-screen flex flex-col md:flex-row">
+          {films.map((film, index) => (
+            <FilmCard key={film.title} {...film} index={index} />
+          ))}
         </div>
       )}
     </div>
